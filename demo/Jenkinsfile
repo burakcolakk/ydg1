@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+    stages {
+        stage('Test') {
+            steps {
+                script {
+                    try {
+                        sh 'mvn test'
+                    } catch (err) {
+                        error('Test aşaması başarısız!')
+                    }
+                }
+            }
+            post {
+                success {
+                    echo 'Testler başarılı, deploy aşamasına geçiliyor.'
+                }
+                failure {
+                    error('Testler başarısız, pipeline durduruluyor.')
+                }
+            }
+        }
+        stage('Deploy') {
+            when {
+                expression {
+                    currentBuild.currentResult == 'SUCCESS'
+                }
+            }
+            steps {
+                echo 'Deploy işlemi başlatıldı (örnek adım).'
+                // Gerçek deploy komutlarınızı buraya ekleyin
+            }
+        }
+    }
+}
+
